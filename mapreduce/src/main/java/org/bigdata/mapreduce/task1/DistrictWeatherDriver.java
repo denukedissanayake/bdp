@@ -22,36 +22,32 @@ public class DistrictWeatherDriver extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
-        if (args.length != 2) {
-            System.err.println("Usage: DistrictWeatherDriver <input_path> <output_path>");
-            System.err.println("  input_path: Comma-separated paths to weather.csv and location.csv");
-            System.err.println("  Example: /data/weather.csv,/data/location.csv /output/task1");
-            return -1;
+        if (args.length != 3) {
+            System.err.println("Usage: DistrictWeatherDriver <weather_data_path> <location_data_path> <output_path>");
+            System.exit(-1);
         }
 
-        Configuration conf = getConf();
-        Job job = Job.getInstance(conf, "District Weather Analysis");
+        Configuration conf = new Configuration();
 
-        // Set JAR class
+        // Set location data path in configuration so mapper can load it
+        conf.set("location.data.path", args[1]);
+
+        Job job = Job.getInstance(conf, "District Weather Analysis");
         job.setJarByClass(DistrictWeatherDriver.class);
 
-        // Set Mapper and Reducer classes
+        // Mapper and Reducer classes
         job.setMapperClass(DistrictWeatherMapper.class);
+        // Note: Cannot use combiner because reducer output format differs from mapper
+        // output
         job.setReducerClass(DistrictWeatherReducer.class);
 
-        // Set Combiner (same as Reducer for efficiency)
-        job.setCombinerClass(DistrictWeatherReducer.class);
-
-        // Set output key and value types
+        // Output key-value types
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
-        // Set input and output paths
-        String[] inputPaths = args[0].split(",");
-        for (String inputPath : inputPaths) {
-            FileInputFormat.addInputPath(job, new Path(inputPath.trim()));
-        }
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        // Input and output paths - only process weather data file
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[2]));
 
         // Submit job and wait for completion
         boolean success = job.waitForCompletion(true);

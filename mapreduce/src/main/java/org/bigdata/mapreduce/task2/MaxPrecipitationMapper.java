@@ -30,8 +30,8 @@ public class MaxPrecipitationMapper extends Mapper<LongWritable, Text, Text, Dou
 
         String[] fields = line.split(",");
 
-        // Weather data should have at least 13 fields
-        if (fields.length < 13) {
+        // Weather data should have at least 14 fields (we need index 13)
+        if (fields.length < 14) {
             return;
         }
 
@@ -46,8 +46,8 @@ public class MaxPrecipitationMapper extends Mapper<LongWritable, Text, Text, Dou
                 return; // Skip invalid dates
             }
 
-            // Extract precipitation_hours (index 9)
-            double precipitationHours = WeatherDataParser.parseDouble(fields[9]);
+            // Extract precipitation_hours (index 13)
+            double precipitationHours = WeatherDataParser.parseDouble(fields[13]);
 
             // Create key: year-month
             String yearMonth = year + "-" + month;

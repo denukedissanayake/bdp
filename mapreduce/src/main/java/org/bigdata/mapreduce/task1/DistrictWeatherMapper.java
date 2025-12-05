@@ -15,10 +15,50 @@ import java.util.Map;
  */
 public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text> {
 
-    // Store location_id to city_name mapping
-    private static Map<String, String> locationMap = new HashMap<>();
+    // Store location_id to city_name mapping (not static - each mapper has its own)
+    private Map<String, String> locationMap = new HashMap<>();
     private Text outputKey = new Text();
     private Text outputValue = new Text();
+
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+        super.setup(context);
+
+        // Load location data from HDFS
+        // Get the location file path from job configuration
+        org.apache.hadoop.conf.Configuration conf = context.getConfiguration();
+        String locationPath = conf.get("location.data.path", "/user/test/input/locationData.csv");
+
+        // Read location data from HDFS
+        org.apache.hadoop.fs.Path path = new org.apache.hadoop.fs.Path(locationPath);
+        org.apache.hadoop.fs.FileSystem fs = path.getFileSystem(conf);
+
+        if (fs.exists(path)) {
+            try (org.apache.hadoop.fs.FSDataInputStream inputStream = fs.open(path);
+                    java.io.BufferedReader reader = new java.io.BufferedReader(
+                            new java.io.InputStreamReader(inputStream))) {
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    line = line.trim();
+
+                    // Skip header
+                    if (WeatherDataParser.isHeader(line)) {
+                        continue;
+                    }
+
+                    String[] fields = line.split(",");
+                    if (fields.length >= 8) {
+                        String locationId = fields[0].trim();
+                        String cityName = fields[7].trim();
+                        locationMap.put(locationId, cityName);
+                    }
+                }
+            }
+        }
+
+        System.err.println("DEBUG: Loaded " + locationMap.size() + " locations in setup()");
+    }
 
     @Override
     protected void map(LongWritable key, Text value, Context context)
@@ -33,20 +73,8 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
 
         String[] fields = line.split(",");
 
-        // Determine if this is location data or weather data
-        if (isLocationData(fields)) {
-            // Process location data: location_id, latitude, longitude, elevation,
-            // utc_offset_seconds, timezone, timezone_abbreviation, city_name
-            if (fields.length >= 8) {
-                String locationId = fields[0].trim();
-                String cityName = fields[7].trim(); // city_name is at index 7
-                locationMap.put(locationId, cityName);
-                System.err.println("DEBUG: Added location " + locationId + " -> " + cityName + ", map size: "
-                        + locationMap.size());
-            }
-        } else {
-            // Process weather data
-            System.err.println("DEBUG: Processing weather data, locationMap size: " + locationMap.size());
+        // Only process weather data (location data is loaded in setup())
+        if (fields.length >= 14) {
             processWeatherData(fields, context);
         }
     }
@@ -74,7 +102,7 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
     private void processWeatherData(String[] fields, Context context)
             throws IOException, InterruptedException {
 
-        if (fields.length < 13) {
+        if (fields.length < 14) {
             return; // Skip malformed records
         }
 
@@ -96,8 +124,8 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
                 return; // Skip invalid dates
             }
 
-            // Extract precipitation_hours (index 9) and temperature_2m_mean (index 5)
-            double precipitationHours = WeatherDataParser.parseDouble(fields[9]);
+            // Extract precipitation_hours (index 13) and temperature_2m_mean (index 5)
+            double precipitationHours = WeatherDataParser.parseDouble(fields[13]);
             double temperatureMean = WeatherDataParser.parseDouble(fields[5]);
 
             // Create composite key: district|year|month
