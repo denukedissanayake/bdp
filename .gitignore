@@ -1,0 +1,181 @@
+# ============================================
+# Big Data Programming - Git Ignore
+# ============================================
+
+# ============================================
+# Maven / Java
+# ============================================
+target/
+*.jar
+!mapreduce/weather-analytics.jar
+*.war
+*.ear
+*.class
+*.log
+
+# Maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# ============================================
+# IDE Files
+# ============================================
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+nbproject/
+nbbuild/
+dist/
+nbdist/
+
+# ============================================
+# macOS
+# ============================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ============================================
+# Hadoop / Big Data
+# ============================================
+# Hadoop logs
+hadoop-*.log
+*.log.*
+
+# HDFS metadata
+.hadoop/
+metastore_db/
+
+# Hive
+derby.log
+metastore_db/
+
+# Spark
+spark-warehouse/
+*.parquet
+*.orc
+
+# ============================================
+# Data Files (Large CSV files)
+# ============================================
+# Uncomment if you don't want to track large data files
+# *.csv
+# data/*.csv
+# But keep sample/small files for testing
+!data/sample*.csv
+
+# ============================================
+# Python (if you add Python scripts)
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# ============================================
+# R (if you use R for analysis)
+# ============================================
+.Rhistory
+.RData
+.Rproj.user
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+
+# ============================================
+# Build and Output Directories
+# ============================================
+build/
+dist/
+output/
+results/
+
+# ============================================
+# Environment and Configuration
+# ============================================
+.env
+.env.local
+*.properties.local
+config/local/
+
+# ============================================
+# Documentation Build
+# ============================================
+docs/_build/
+site/
+
+# ============================================
+# Test Coverage
+# ============================================
+coverage/
+.coverage
+htmlcov/
+
+# ============================================
+# Package Managers
+# ============================================
+node_modules/
+package-lock.json
+yarn.lock
+
+# ============================================
+# Compiled Source
+# ============================================
+*.com
+*.dll
+*.exe
+*.o
+*.so
+
+# ============================================
+# Archives
+# ============================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+*.zip
+
+# ============================================
+# Keep These Files
+# ============================================
+!.gitkeep
+!README.md
+!pom.xml
