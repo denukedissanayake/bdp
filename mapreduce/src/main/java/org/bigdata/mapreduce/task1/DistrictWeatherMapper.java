@@ -41,9 +41,12 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
                 String locationId = fields[0].trim();
                 String cityName = fields[7].trim(); // city_name is at index 7
                 locationMap.put(locationId, cityName);
+                System.err.println("DEBUG: Added location " + locationId + " -> " + cityName + ", map size: "
+                        + locationMap.size());
             }
         } else {
             // Process weather data
+            System.err.println("DEBUG: Processing weather data, locationMap size: " + locationMap.size());
             processWeatherData(fields, context);
         }
     }
