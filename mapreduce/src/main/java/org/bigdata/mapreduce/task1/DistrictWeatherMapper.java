@@ -24,7 +24,7 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
     protected void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException {
 
-        String line = value.toString();
+        String line = value.toString().trim(); // Trim to handle \r\n line endings
 
         // Skip header lines
         if (WeatherDataParser.isHeader(line)) {
