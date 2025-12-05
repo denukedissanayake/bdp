@@ -36,10 +36,10 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
         // Determine if this is location data or weather data
         if (isLocationData(fields)) {
             // Process location data: location_id, latitude, longitude, elevation,
-            // timezone, timezone_abbreviation, city_name
-            if (fields.length >= 7) {
+            // utc_offset_seconds, timezone, timezone_abbreviation, city_name
+            if (fields.length >= 8) {
                 String locationId = fields[0].trim();
-                String cityName = fields[6].trim();
+                String cityName = fields[7].trim(); // city_name is at index 7
                 locationMap.put(locationId, cityName);
             }
         } else {
@@ -52,9 +52,9 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
      * Check if the data is location data (has latitude/longitude)
      */
     private boolean isLocationData(String[] fields) {
-        // Location data has 7 fields, weather data has 13+ fields
+        // Location data has 8 fields, weather data has 21 fields
         // Also check if second field looks like a latitude (decimal number)
-        if (fields.length == 7) {
+        if (fields.length == 8) {
             try {
                 Double.parseDouble(fields[1]); // Try parsing latitude
                 return true;
