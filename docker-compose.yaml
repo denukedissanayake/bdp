@@ -9,20 +9,35 @@ services:
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
     environment:
-      - CLUSTER_NAME=hadoop-cluster
+      - CLUSTER_NAME=test
     env_file:
       - ./hadoop.env
     networks:
       - hadoop
 
-  datanode:
+  datanode1:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: datanode
+    container_name: datanode1
     restart: always
     depends_on:
       - namenode
     volumes:
-      - hadoop_datanode:/hadoop/dfs/data
+      - hadoop_datanode1:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+    networks:
+      - hadoop
+
+  datanode2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode2
+    restart: always
+    depends_on:
+      - namenode
+    volumes:
+      - hadoop_datanode2:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
     env_file:
@@ -36,19 +51,20 @@ services:
     restart: always
     depends_on:
       - namenode
-      - datanode
+      - datanode1
+      - datanode2
     ports:
       - "8088:8088"
     environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864"
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode1:9864 datanode2:9864"
     env_file:
       - ./hadoop.env
     networks:
       - hadoop
 
-  nodemanager:
+  nodemanager1:
     image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
-    container_name: nodemanager
+    container_name: nodemanager1
     restart: always
     depends_on:
       - resourcemanager
@@ -59,78 +75,23 @@ services:
     networks:
       - hadoop
 
-  postgres:
-    image: postgres:13
-    container_name: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: hive
-      POSTGRES_PASSWORD: hive
-      POSTGRES_DB: metastore
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - hadoop
-
-  hive-metastore:
-    image: bde2020/hive:2.3.2-postgresql-metastore
-    container_name: hive-metastore
+  nodemanager2:
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+    container_name: nodemanager2
     restart: always
     depends_on:
-      - postgres
-      - namenode
+      - resourcemanager
     environment:
-      - POSTGRES_USER=hive
-      - POSTGRES_PASSWORD=hive
-      - POSTGRES_HOST=postgres
-    ports:
-      - "9083:9083"
-    networks:
-      - hadoop
-
-  hive-server:
-    image: bde2020/hive:2.3.2
-    container_name: hive-server
-    restart: always
-    depends_on:
-      - hive-metastore
+      SERVICE_PRECONDITION: "resourcemanager:8088"
     env_file:
       - ./hadoop.env
-    ports:
-      - "10000:10000"
-      - "10002:10002"
-    networks:
-      - hadoop
-
-  spark:
-    image: apache/spark:3.4.1
-    container_name: spark
-    restart: always
-    user: root
-    depends_on:
-      - namenode
-      - datanode
-    environment:
-      - SPARK_MODE=master
-      - SPARK_MASTER_HOST=spark
-      - SPARK_MASTER_PORT=7077
-    ports:
-      - "8080:8080"
-      - "7077:7077"
-      - "4040:4040"
-    volumes:
-      - ./workspace:/workspace
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
     networks:
       - hadoop
 
 volumes:
   hadoop_namenode:
-  hadoop_datanode:
-  postgres_data:
+  hadoop_datanode1:
+  hadoop_datanode2:
 
 networks:
   hadoop:
-    driver: bridge
