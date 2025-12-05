@@ -1,11 +1,14 @@
+# docker-compose.yml
+version: "3.8"
+
 services:
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
     restart: always
     ports:
-      - "9870:9870"
-      - "9000:9000"
+      - "9870:9870" # NameNode Web UI
+      - "9000:9000" # FS Default
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
     environment:
@@ -54,7 +57,7 @@ services:
       - datanode1
       - datanode2
     ports:
-      - "8088:8088"
+      - "8088:8088" # ResourceManager Web UI
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode1:9864 datanode2:9864"
     env_file:
