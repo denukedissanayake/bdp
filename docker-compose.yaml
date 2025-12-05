@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.3.0-java8
@@ -83,7 +81,7 @@ services:
       - "10002:10002"
 
   spark:
-    image: bitnami/spark:3.5.0
+    image: bitnami/spark:3.4
     container_name: spark
     user: root
     depends_on:
