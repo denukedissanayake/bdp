@@ -81,19 +81,23 @@ services:
       - "10002:10002"
 
   spark:
-    image: bitnami/spark:3.4
+    image: apache/spark:3.4.1
     container_name: spark
     user: root
     depends_on:
       - namenode
       - datanode
     environment:
-      SPARK_MODE: standalone
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark
+      - SPARK_MASTER_PORT=7077
     ports:
       - "8080:8080"
+      - "7077:7077"
       - "4040:4040"
     volumes:
       - ./workspace:/workspace
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
 
 volumes:
   namenode:
