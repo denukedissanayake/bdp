@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.3.0-java8
+    container_name: namenode
+    ports:
+      - "9870:9870"
+      - "8020:8020"
+    volumes:
+      - namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=hadoop-cluster
+    env_file:
+      - ./hadoop.env
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.3.0-java8
+    container_name: datanode
+    volumes:
+      - datanode:/hadoop/dfs/data
+    env_file:
+      - ./hadoop.env
+    depends_on:
+      - namenode
+    ports:
+      - "9864:9864"
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+      POSTGRES_DB: metastore
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  hive-metastore:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    depends_on:
+      - postgres
+      - namenode
+    environment:
+      - POSTGRES_USER=hive
+      - POSTGRES_PASSWORD=hive
+      - POSTGRES_HOST=postgres
+    ports:
+      - "9083:9083"
+
+  hive-server:
+    image: bde2020/hive:2.3.2
+    depends_on:
+      - hive-metastore
+    env_file:
+      - ./hadoop.env
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+
+  spark:
+    image: bitnami/spark:3.5.0
+    container_name: spark
+    user: root
+    depends_on:
+      - namenode
+      - datanode
+    environment:
+      SPARK_MODE: standalone
+    ports:
+      - "8080:8080"
+      - "4040:4040"
+    volumes:
+      - ./workspace:/workspace
+
+volumes:
+  namenode:
+  datanode:
+  postgres:
