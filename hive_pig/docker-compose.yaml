@@ -1,44 +1,44 @@
 services:
-  # HDFS NameNode
-  namenode:
+  # HDFS NameNode for Hive
+  hive-namenode:
     image: ramilu90/hive-namenode:1.0.0
-    container_name: namenode
+    container_name: hive-namenode
     restart: always
     env_file:
       - ./hadoop.env
     environment:
       - CLUSTER_NAME=hadoop-cluster
-      - HDFS_NAMENODE_RPC_ADDRESS=namenode:8020
+      - HDFS_NAMENODE_RPC_ADDRESS=hive-namenode:8020
     volumes:
       - ./data/namenode:/hadoop/dfs/name
     ports:
-      - "50070:50070"
-      - "8020:8020"
+      - "50071:50070"
+      - "8021:8020"
     networks:
-      - hadoop-net
+      - hive-net
     healthcheck:
       test: ["CMD", "hdfs", "dfsadmin", "-report"]
       interval: 10s
       timeout: 5s
       retries: 20
 
-  # HDFS DataNode
-  datanode:
+  # HDFS DataNode for Hive
+  hive-datanode:
     image: ramilu90/hive-datanode:1.0.0
-    container_name: datanode
+    container_name: hive-datanode
     restart: always
     env_file:
       - ./hadoop.env
     environment:
-      - SERVICE_PRECONDITION=namenode:8020
-      - HDFS_NAMENODE_RPC_ADDRESS=namenode:8020
+      - SERVICE_PRECONDITION=hive-namenode:8020
+      - HDFS_NAMENODE_RPC_ADDRESS=hive-namenode:8020
     volumes:
       - ./data/datanode:/hadoop/dfs/data
     depends_on:
-      namenode:
+      hive-namenode:
         condition: service_healthy
     networks:
-      - hadoop-net
+      - hive-net
 
   # PostgreSQL for Hive Metastore
   hive-metastore-postgresql:
@@ -50,11 +50,11 @@ services:
       POSTGRES_PASSWORD: hive
       POSTGRES_DB: metastore
     volumes:
-      - metastore-db:/var/lib/postgresql/data
+      - hive-metastore-db:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
-      - hadoop-net
+      - hive-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U hive"]
       interval: 5s
@@ -70,11 +70,11 @@ services:
     depends_on:
       hive-metastore-postgresql:
         condition: service_healthy
-      namenode:
+      hive-namenode:
         condition: service_healthy
     command: ["schematool", "-dbType", "postgres", "-initSchema", "-verbose"]
     networks:
-      - hadoop-net
+      - hive-net
 
   # Hive Metastore
   hive-metastore:
@@ -87,13 +87,13 @@ services:
     depends_on:
       hive-metastore-init:
         condition: service_completed_successfully
-      namenode:
+      hive-namenode:
         condition: service_healthy
     command: /opt/hive/bin/hive --service metastore
     ports:
-      - "9083:9083"
+      - "9084:9083"
     networks:
-      - hadoop-net
+      - hive-net
 
   # HiveServer2
   hive-server:
@@ -107,17 +107,17 @@ services:
     depends_on:
       hive-metastore:
         condition: service_started
-      namenode:
+      hive-namenode:
         condition: service_healthy
     command: /opt/hive/bin/hiveserver2
     ports:
-      - "10000:10000"
+      - "10001:10000"
     networks:
-      - hadoop-net
+      - hive-net
 
 volumes:
-  metastore-db:
+  hive-metastore-db:
 
 networks:
-  hadoop-net:
+  hive-net:
     driver: bridge
