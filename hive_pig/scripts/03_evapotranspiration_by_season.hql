@@ -1,19 +1,11 @@
--- ==========================================
 -- Task 2: Average Evapotranspiration by Agricultural Season
--- ==========================================
--- Calculates average evapotranspiration (et0_fao_evapotranspiration)
--- for each agricultural season in each district over the years.
---
--- Agricultural Seasons in Sri Lanka:
--- - Maha Season: September to March (monsoon season)
--- - Yala Season: April to August (dry season)
+-- Calculates average evapotranspiration for Maha (Sep-Mar) and Yala (Apr-Aug) seasons
 
--- Create view with season classification
+SET hive.cli.print.header=true;
+
 DROP VIEW IF EXISTS weather_with_season;
 CREATE VIEW weather_with_season AS
 SELECT 
-    w.location_id,
-    w.date_str,
     CAST(SPLIT(w.date_str, '/')[0] AS INT) AS month,
     CAST(SPLIT(w.date_str, '/')[2] AS INT) AS year,
     w.et0_fao_evapotranspiration,
@@ -26,13 +18,12 @@ SELECT
 FROM weather_data w
 JOIN location_data l ON w.location_id = l.location_id;
 
--- Average Evapotranspiration by Season, District, and Year
 SELECT 
-    district,
-    agricultural_season,
-    year,
-    ROUND(AVG(et0_fao_evapotranspiration), 4) AS avg_evapotranspiration,
-    COUNT(*) AS days_count
+    district AS District,
+    agricultural_season AS Season,
+    year AS Year,
+    ROUND(AVG(et0_fao_evapotranspiration), 4) AS Avg_Evapotranspiration,
+    COUNT(*) AS Days_Count
 FROM weather_with_season
 GROUP BY district, agricultural_season, year
 ORDER BY district, year, agricultural_season;
