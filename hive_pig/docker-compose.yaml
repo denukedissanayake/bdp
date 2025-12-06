@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   # HDFS NameNode
   namenode:
     image: ramilu90/hive-namenode:1.0.0
-    container_name: hive-namenode
+    container_name: namenode
     restart: always
     env_file:
       - ./hadoop.env
@@ -12,12 +10,12 @@ services:
       - CLUSTER_NAME=hadoop-cluster
       - HDFS_NAMENODE_RPC_ADDRESS=namenode:8020
     volumes:
-      - namenode-data:/hadoop/dfs/name
+      - ./data/namenode:/hadoop/dfs/name
     ports:
       - "50070:50070"
       - "8020:8020"
     networks:
-      - hive-net
+      - hadoop-net
     healthcheck:
       test: ["CMD", "hdfs", "dfsadmin", "-report"]
       interval: 10s
@@ -27,7 +25,7 @@ services:
   # HDFS DataNode
   datanode:
     image: ramilu90/hive-datanode:1.0.0
-    container_name: hive-datanode
+    container_name: datanode
     restart: always
     env_file:
       - ./hadoop.env
@@ -35,12 +33,12 @@ services:
       - SERVICE_PRECONDITION=namenode:8020
       - HDFS_NAMENODE_RPC_ADDRESS=namenode:8020
     volumes:
-      - datanode-data:/hadoop/dfs/data
+      - ./data/datanode:/hadoop/dfs/data
     depends_on:
       namenode:
         condition: service_healthy
     networks:
-      - hive-net
+      - hadoop-net
 
   # PostgreSQL for Hive Metastore
   hive-metastore-postgresql:
@@ -56,7 +54,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - hive-net
+      - hadoop-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U hive"]
       interval: 5s
@@ -76,7 +74,7 @@ services:
         condition: service_healthy
     command: ["schematool", "-dbType", "postgres", "-initSchema", "-verbose"]
     networks:
-      - hive-net
+      - hadoop-net
 
   # Hive Metastore
   hive-metastore:
@@ -95,9 +93,9 @@ services:
     ports:
       - "9083:9083"
     networks:
-      - hive-net
+      - hadoop-net
 
-  # Hive Server
+  # HiveServer2
   hive-server:
     image: ramilu90/hive-server:1.0.0
     container_name: hive-server
@@ -115,13 +113,11 @@ services:
     ports:
       - "10000:10000"
     networks:
-      - hive-net
+      - hadoop-net
 
 volumes:
-  namenode-data:
-  datanode-data:
   metastore-db:
 
 networks:
-  hive-net:
+  hadoop-net:
     driver: bridge
