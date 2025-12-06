@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # HDFS NameNode
+  namenode:
+    image: ramilu90/hive-namenode:1.0.0
+    container_name: hive-namenode
+    restart: always
+    env_file:
+      - ./hadoop.env
+    environment:
+      - CLUSTER_NAME=hadoop-cluster
+      - HDFS_NAMENODE_RPC_ADDRESS=namenode:8020
+    volumes:
+      - namenode-data:/hadoop/dfs/name
+    ports:
+      - "50070:50070"
+      - "8020:8020"
+    networks:
+      - hive-net
+    healthcheck:
+      test: ["CMD", "hdfs", "dfsadmin", "-report"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # HDFS DataNode
+  datanode:
+    image: ramilu90/hive-datanode:1.0.0
+    container_name: hive-datanode
+    restart: always
+    env_file:
+      - ./hadoop.env
+    environment:
+      - SERVICE_PRECONDITION=namenode:8020
+      - HDFS_NAMENODE_RPC_ADDRESS=namenode:8020
+    volumes:
+      - datanode-data:/hadoop/dfs/data
+    depends_on:
+      namenode:
+        condition: service_healthy
+    networks:
+      - hive-net
+
+  # PostgreSQL for Hive Metastore
+  hive-metastore-postgresql:
+    image: ramilu90/hive-metastore-postgresql:1.0.0
+    container_name: hive-metastore-postgresql
+    restart: always
+    environment:
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+      POSTGRES_DB: metastore
+    volumes:
+      - metastore-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - hive-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hive"]
+      interval: 5s
+      retries: 20
+      timeout: 5s
+
+  # Hive Metastore Schema Init
+  hive-metastore-init:
+    image: ramilu90/hive-metastore-init:1.0.0
+    container_name: hive-metastore-init
+    env_file:
+      - ./hadoop.env
+    depends_on:
+      hive-metastore-postgresql:
+        condition: service_healthy
+      namenode:
+        condition: service_healthy
+    command: ["schematool", "-dbType", "postgres", "-initSchema", "-verbose"]
+    networks:
+      - hive-net
+
+  # Hive Metastore
+  hive-metastore:
+    image: ramilu90/hive-metastore:1.0.0
+    container_name: hive-metastore
+    env_file:
+      - ./hadoop.env
+    environment:
+      - HADOOP_USER_NAME=root
+    depends_on:
+      hive-metastore-init:
+        condition: service_completed_successfully
+      namenode:
+        condition: service_healthy
+    command: /opt/hive/bin/hive --service metastore
+    ports:
+      - "9083:9083"
+    networks:
+      - hive-net
+
+  # Hive Server
+  hive-server:
+    image: ramilu90/hive-server:1.0.0
+    container_name: hive-server
+    platform: linux/amd64
+    env_file:
+      - ./hadoop.env
+    environment:
+      - HADOOP_USER_NAME=root
+    depends_on:
+      hive-metastore:
+        condition: service_started
+      namenode:
+        condition: service_healthy
+    command: /opt/hive/bin/hiveserver2
+    ports:
+      - "10000:10000"
+    networks:
+      - hive-net
+
+volumes:
+  namenode-data:
+  datanode-data:
+  metastore-db:
+
+networks:
+  hive-net:
+    driver: bridge
