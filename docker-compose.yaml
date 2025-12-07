@@ -170,6 +170,37 @@ services:
     networks:
       - bdp-network
 
+  # ============================================
+  # Spark Services
+  # ============================================
+
+  spark-master:
+    image: bde2020/spark-master:2.4.5-hadoop2.7
+    container_name: spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+    env_file:
+      - ./hadoop.env
+    networks:
+      - bdp-network
+
+  spark-worker:
+    image: bde2020/spark-worker:2.4.5-hadoop2.7
+    container_name: spark-worker
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    environment:
+      - "SPARK_MASTER=spark://spark-master:7077"
+    env_file:
+      - ./hadoop.env
+    networks:
+      - bdp-network
+
 volumes:
   hadoop_namenode:
   hadoop_datanode:
