@@ -33,9 +33,9 @@ spark = SparkSession.builder \
     .appName("Evapotranspiration_MLlib") \
     .getOrCreate()
 
-# Load data from HDFS
+# Load data from mounted data folder
 df = spark.read.option("header", "true").option("inferSchema", "true") \
-    .csv("hdfs://namenode:9000/user/test/input/weatherData.csv")
+    .csv("/opt/data/weatherData.csv")
 
 print("Data loaded successfully!")
 print(f"Total records: {df.count()}")
