@@ -201,11 +201,34 @@ services:
     networks:
       - bdp-network
 
+  # ============================================
+  # Zeppelin (For Spark MLlib Interactive Notebooks)
+  # ============================================
+
+  zeppelin:
+    image: apache/zeppelin:0.10.1
+    container_name: zeppelin
+    ports:
+      - "8082:8080"
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_HOME=/spark
+      - ZEPPELIN_LOG_DIR=/logs
+      - ZEPPELIN_NOTEBOOK_DIR=/notebook
+    volumes:
+      - ./mllib:/notebook
+      - zeppelin_logs:/logs
+    depends_on:
+      - spark-master
+    networks:
+      - bdp-network
+
 volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
   hive_metastore_db:
+  zeppelin_logs:
 
 networks:
   bdp-network:
