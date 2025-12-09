@@ -11,21 +11,12 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-/**
- * Driver class for Task 2: Find month and year with highest total precipitation
- * 
- * Usage: hadoop jar mapreduce-task.jar
- * org.bigdata.mapreduce.task2.MaxPrecipitationDriver
- * <input_path> <output_path>
- */
 public class MaxPrecipitationDriver extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
         if (args.length != 2) {
             System.err.println("Usage: MaxPrecipitationDriver <input_path> <output_path>");
-            System.err.println("  input_path: Path to weather.csv");
-            System.err.println("  Example: /data/weather.csv /output/task2");
             return -1;
         }
 

@@ -8,10 +8,6 @@ import org.bigdata.mapreduce.util.WeatherDataParser;
 
 import java.io.IOException;
 
-/**
- * Reducer for Task 2: Aggregates precipitation by month-year and finds the
- * maximum
- */
 public class MaxPrecipitationReducer extends Reducer<Text, DoubleWritable, NullWritable, Text> {
 
     private String maxYearMonth = "";
@@ -37,7 +33,6 @@ public class MaxPrecipitationReducer extends Reducer<Text, DoubleWritable, NullW
 
     @Override
     protected void cleanup(Context context) throws IOException, InterruptedException {
-        // After processing all records, emit the maximum
         if (!maxYearMonth.isEmpty()) {
             String[] parts = maxYearMonth.split("-");
             if (parts.length == 2) {
@@ -45,7 +40,7 @@ public class MaxPrecipitationReducer extends Reducer<Text, DoubleWritable, NullW
                 int month = Integer.parseInt(parts[1]);
                 String monthOrdinal = WeatherDataParser.getOrdinal(month);
 
-                // Format output as specified:
+                // Format output as follows:
                 // "2nd month in 2019 had the highest total precipitation of 300 hr"
                 String output = String.format("%s month in %s had the highest total precipitation of %.0f hr",
                         monthOrdinal, year, maxPrecipitation);
