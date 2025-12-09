@@ -21,7 +21,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS location_data (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-LOCATION '/user/hive/warehouse/location_data'
+LOCATION '/user/data/input/location_data'
 TBLPROPERTIES ('skip.header.line.count'='1');
 
 -- Create Weather Data Table
@@ -53,7 +53,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS weather_data (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-LOCATION '/user/hive/warehouse/weather_data'
+LOCATION '/user/data/input/weather_data'
 TBLPROPERTIES ('skip.header.line.count'='1');
 
 -- Verify tables created successfully

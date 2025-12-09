@@ -23,7 +23,7 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
         // Load location data from HDFS
         // Get the location file path from job configuration
         org.apache.hadoop.conf.Configuration conf = context.getConfiguration();
-        String locationPath = conf.get("location.data.path", "/user/test/input/locationData.csv");
+        String locationPath = conf.get("location.data.path", "/user/data/input/locationData.csv");
 
         // Read location data from HDFS
         org.apache.hadoop.fs.Path path = new org.apache.hadoop.fs.Path(locationPath);

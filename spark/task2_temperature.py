@@ -95,7 +95,7 @@ def main():
     spark.sparkContext.setLogLevel("WARN")
     
     # HDFS path - data should already be uploaded
-    input_path = "hdfs://namenode:9000/user/test/input/weatherData.csv"
+    input_path = "hdfs://namenode:9000/user/data/input/weatherData.csv"
     
     print("=" * 70)
     print("TASK 2: Weekly Maximum Temperatures for Hottest Months of Each Year")
