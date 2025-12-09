@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Analytics Dashboard | 2010-2020 Analysis</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Sidebar / Navigation -->
+    <nav class="sidebar">
+        <div class="brand">
+            <div class="logo-icon">C</div>
+            <h2>Climate<span class="highlight">Gaze</span></h2>
+        </div>
+
+        <ul class="nav-links">
+            <li class="active"><a href="#overview">Overview</a></li>
+            <li><a href="#precipitation">Precipitation</a></li>
+            <li><a href="#temperature">Temperature</a></li>
+            <li><a href="#extreme">Extreme Events</a></li>
+        </ul>
+
+        <div class="nav-footer">
+            <p>Big Data Project</p>
+            <span>v1.0.0</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Header -->
+        <header class="top-bar">
+            <div class="breadcrumbs">
+                <span>Dashboard</span> / <span>Analytics Overview</span>
+            </div>
+            <div class="user-profile">
+                <span>Weather Analyst</span>
+                <div class="avatar">WA</div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <div class="hero" id="overview">
+            <h1>Weather Pattern Analysis <span class="subtitle">2010 - 2020</span></h1>
+            <p>Key insights into precipitation variance, temperature anomalies, and extreme weather occurrences across
+                districts.</p>
+        </div>
+
+        <!-- Metric Cards Row -->
+        <div class="metrics-grid">
+            <div class="metric-card gradient-1">
+                <div class="metric-info">
+                    <h3>Total Districts</h3>
+                    <p class="number">25</p>
+                </div>
+                <div class="icon">🗺️</div>
+            </div>
+            <div class="metric-card gradient-2">
+                <div class="metric-info">
+                    <h3>Year Range</h3>
+                    <p class="number">10 Yrs</p>
+                </div>
+                <div class="icon">📅</div>
+            </div>
+            <div class="metric-card gradient-3">
+                <div class="metric-info">
+                    <h3>Data Points</h3>
+                    <p class="number">140k+</p>
+                </div>
+                <div class="icon">📊</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid h-grid">
+
+            <!-- Chart 1: Top 5 Districts by Precip -->
+            <div class="chart-card wide" id="precipitation">
+                <div class="card-header">
+                    <h3>Top 5 Wettest Districts</h3>
+                    <p>Based on total cumulative precipitation over the decade</p>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="topDistrictsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3a: Temperature > 30C (Overall - Pie) -->
+            <div class="chart-card" id="temperature">
+                <div class="card-header">
+                    <h3>High Heat Frequency (Overall)</h3>
+                    <p>% of months with mean temp > 30°C across all years</p>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="tempHighChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3b: Temperature > 30C (Per Year - Line) -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h3>High Heat Frequency (By Year)</h3>
+                    <p>% of months with mean temp > 30°C per year</p>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="tempYearlyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 4: Extreme Weather -->
+            <div class="chart-card wide" id="extreme">
+                <div class="card-header">
+                    <h3>Extreme Weather Events</h3>
+                    <p>Days with High Precip (>10mm) AND High Wind (>40km/h)</p>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="extremeWeatherChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Precipitous Month (Table) - Now at bottom -->
+            <div class="chart-card wide">
+                <div class="card-header">
+                    <h3>Peak Rainfall Seasonality</h3>
+                    <p>Most precipitous month for each district</p>
+                </div>
+                <!-- Scrollable Table Container -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>District</th>
+                                <th>Peak Month</th>
+                                <th>Total Precipitation (hrs)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="precipTableBody">
+                            <tr class="loading-row">
+                                <td colspan="3">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Big Data Analytics Project. Built with MapReduce, Hive, and Spark.</p>
+        </footer>
+
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

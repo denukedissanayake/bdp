@@ -1,0 +1,64 @@
+{
+    "top_districts": {
+        "labels": [
+            "Ampara",
+            "Colombo",
+            "Galle",
+            "Gampaha",
+            "Kandy"
+        ],
+        "data": [
+            2034.0,
+            900.0,
+            800.0,
+            650.0,
+            300.0
+        ]
+    },
+    "peak_seasonality": [
+        {
+            "district": "Ampara",
+            "month": "January",
+            "total_precipitation": 361.0
+        },
+        {
+            "district": "Colombo",
+            "month": "February",
+            "total_precipitation": 500.0
+        },
+        {
+            "district": "Gampaha",
+            "month": "February",
+            "total_precipitation": 600.0
+        },
+        {
+            "district": "Kandy",
+            "month": "February",
+            "total_precipitation": 300.0
+        },
+        {
+            "district": "Jaffna",
+            "month": "February",
+            "total_precipitation": 100.0
+        },
+        {
+            "district": "Galle",
+            "month": "February",
+            "total_precipitation": 800.0
+        }
+    ],
+    "temperature_analysis": {
+        "overall": {
+            "above_30": 14.8,
+            "below_30": 85.2
+        },
+        "by_year": {
+            "2010": 21.1,
+            "2011": 0.0
+        }
+    },
+    "meta": {
+        "total_records": 27,
+        "generated_at": "Today"
+    }
+}
