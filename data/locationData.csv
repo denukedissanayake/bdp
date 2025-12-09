@@ -9,7 +9,7 @@ location_id,latitude,longitude,elevation,utc_offset_seconds,timezone,timezone_ab
 7,5.940246,80.55,6,19800,Asia/Colombo,530,Matara
 8,6.1511426,81.127815,8,19800,Asia/Colombo,530,Hambantota
 9,9.66608,80.034874,8,19800,Asia/Colombo,530,Jaffna
-10,9.384886,80.38228,19,19800,Asia/Colombo,530,Kilinochchi[1]
+10,9.384886,80.38228,19,19800,Asia/Colombo,530,Kilinochchi
 11,8.963093,79.96543,5,19800,Asia/Colombo,530,Mannar
 12,8.752197,80.53448,104,19800,Asia/Colombo,530,Vavuniya
 13,9.244288,80.789246,5,19800,Asia/Colombo,530,Mullaitivu
