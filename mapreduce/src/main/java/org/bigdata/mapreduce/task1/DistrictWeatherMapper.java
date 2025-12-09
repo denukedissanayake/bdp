@@ -9,13 +9,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Mapper for Task 1: District-level precipitation and temperature analysis
- * Processes both weather and location data to emit district-month aggregations
- */
 public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text> {
 
-    // Store location_id to city_name mapping (not static - each mapper has its own)
+    // Store location_id to city_name mapping
     private Map<String, String> locationMap = new HashMap<>();
     private Text outputKey = new Text();
     private Text outputValue = new Text();
@@ -64,46 +60,24 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
     protected void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException {
 
-        String line = value.toString().trim(); // Trim to handle \r\n line endings
+        String line = value.toString().trim();
 
-        // Skip header lines
         if (WeatherDataParser.isHeader(line)) {
             return;
         }
 
         String[] fields = line.split(",");
 
-        // Only process weather data (location data is loaded in setup())
         if (fields.length >= 14) {
             processWeatherData(fields, context);
         }
     }
 
-    /**
-     * Check if the data is location data (has latitude/longitude)
-     */
-    private boolean isLocationData(String[] fields) {
-        // Location data has 8 fields, weather data has 21 fields
-        // Also check if second field looks like a latitude (decimal number)
-        if (fields.length == 8) {
-            try {
-                Double.parseDouble(fields[1]); // Try parsing latitude
-                return true;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Process weather data and emit key-value pairs
-     */
     private void processWeatherData(String[] fields, Context context)
             throws IOException, InterruptedException {
 
         if (fields.length < 14) {
-            return; // Skip malformed records
+            return;
         }
 
         try {
@@ -113,7 +87,7 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
             // Get city name from location map
             String cityName = locationMap.get(locationId);
             if (cityName == null || cityName.isEmpty()) {
-                return; // Skip if location not found
+                return;
             }
 
             // Extract year and month
@@ -121,7 +95,7 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
             int month = WeatherDataParser.getMonth(date);
 
             if (year == -1 || month == -1) {
-                return; // Skip invalid dates
+                return;
             }
 
             // Extract precipitation_hours (index 13) and temperature_2m_mean (index 5)
@@ -136,10 +110,12 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
             String compositeValue = precipitationHours + "," + temperatureMean + ",1";
             outputValue.set(compositeValue);
 
+            // Return key-value pair
+            // key -> district|year|month
+            // value -> precipitation_hours,temperature_mean,count
             context.write(outputKey, outputValue);
 
         } catch (Exception e) {
-            // Skip records with parsing errors
             System.err.println("Error processing record: " + e.getMessage());
         }
     }

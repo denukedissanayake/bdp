@@ -6,14 +6,16 @@ import org.bigdata.mapreduce.util.WeatherDataParser;
 
 import java.io.IOException;
 
-/**
- * Reducer for Task 1: Aggregates precipitation and temperature by
- * district-month
- */
 public class DistrictWeatherReducer extends Reducer<Text, Text, Text, Text> {
 
     private Text outputValue = new Text();
 
+    /**
+     * Reduces the values for each key (district-month) by aggregating
+     * precipitation and temperature data.
+     * Key: "Gampaha|2010|1"
+     * Values: ["0.5,25.4,1", "1.0,26.2,1", "0.0,24.8,1", ...]
+     */
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context)
             throws IOException, InterruptedException {
@@ -42,7 +44,7 @@ public class DistrictWeatherReducer extends Reducer<Text, Text, Text, Text> {
             String year = keyParts[1];
             int month = Integer.parseInt(keyParts[2]);
 
-            // Format output as specified:
+            // Format output as follows:
             // "Gampaha had a total precipitation of 30 hours with a mean temperature of 25
             // for 2nd month"
             String monthOrdinal = WeatherDataParser.getOrdinal(month);

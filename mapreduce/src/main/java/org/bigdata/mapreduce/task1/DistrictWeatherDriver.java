@@ -13,10 +13,6 @@ import org.apache.hadoop.util.ToolRunner;
 /**
  * Driver class for Task 1: District-level precipitation and temperature
  * analysis
- * 
- * Usage: hadoop jar mapreduce-task.jar
- * org.bigdata.mapreduce.task1.DistrictWeatherDriver
- * <input_path> <output_path>
  */
 public class DistrictWeatherDriver extends Configured implements Tool {
 
@@ -37,8 +33,6 @@ public class DistrictWeatherDriver extends Configured implements Tool {
 
         // Mapper and Reducer classes
         job.setMapperClass(DistrictWeatherMapper.class);
-        // Note: Cannot use combiner because reducer output format differs from mapper
-        // output
         job.setReducerClass(DistrictWeatherReducer.class);
 
         // Output key-value types

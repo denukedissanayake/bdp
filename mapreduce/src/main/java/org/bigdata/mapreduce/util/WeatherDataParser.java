@@ -12,9 +12,7 @@ import java.util.Map;
  */
 public class WeatherDataParser {
 
-    private static final SimpleDateFormat DATE_FORMAT_1 = new SimpleDateFormat("M/d/yyyy");
-    private static final SimpleDateFormat DATE_FORMAT_2 = new SimpleDateFormat("yyyy-MM-dd");
-    private static final SimpleDateFormat DATE_FORMAT_3 = new SimpleDateFormat("dd/MM/yyyy");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("M/d/yyyy");
 
     /**
      * Parse a CSV line and return a map of column name to value
@@ -31,44 +29,32 @@ public class WeatherDataParser {
     }
 
     /**
-     * Extract year from date string (supports multiple formats: M/d/yyyy,
-     * yyyy-MM-dd, dd/MM/yyyy)
+     * Extract year from date string (format: M/d/yyyy)
      */
     public static int getYear(String dateStr) {
-        SimpleDateFormat[] formats = { DATE_FORMAT_1, DATE_FORMAT_2, DATE_FORMAT_3 };
-
-        for (SimpleDateFormat format : formats) {
-            try {
-                Date date = format.parse(dateStr);
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(date);
-                return cal.get(Calendar.YEAR);
-            } catch (ParseException e) {
-                // Try next format
-            }
+        try {
+            Date date = DATE_FORMAT.parse(dateStr);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            return cal.get(Calendar.YEAR);
+        } catch (ParseException e) {
+            return -1;
         }
-        return -1;
     }
 
     /**
-     * Extract month from date string (supports multiple formats: M/d/yyyy,
-     * yyyy-MM-dd, dd/MM/yyyy)
+     * Extract month from date string (format: M/d/yyyy)
      * Returns 1-12
      */
     public static int getMonth(String dateStr) {
-        SimpleDateFormat[] formats = { DATE_FORMAT_1, DATE_FORMAT_2, DATE_FORMAT_3 };
-
-        for (SimpleDateFormat format : formats) {
-            try {
-                Date date = format.parse(dateStr);
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(date);
-                return cal.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
-            } catch (ParseException e) {
-                // Try next format
-            }
+        try {
+            Date date = DATE_FORMAT.parse(dateStr);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            return cal.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
+        } catch (ParseException e) {
+            return -1;
         }
-        return -1;
     }
 
     /**
