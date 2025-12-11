@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Climate Analytics Dashboard | 2010-2020 Analysis</title>
+    <title>Climate Analytics Dashboard</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,18 +47,11 @@
 
         <!-- Header -->
         <header class="top-bar">
-            <div class="breadcrumbs">
-                <span>Dashboard</span> / <span>Analytics Overview</span>
-            </div>
-            <div class="user-profile">
-                <span>Weather Analyst</span>
-                <div class="avatar">WA</div>
-            </div>
         </header>
 
         <!-- Hero Section -->
         <div class="hero" id="overview">
-            <h1>Weather Pattern Analysis <span class="subtitle">2010 - 2020</span></h1>
+            <h1>Weather Pattern Analysis <span class="subtitle">2010 - 2024</span></h1>
             <p>Key insights into precipitation variance, temperature anomalies, and extreme weather occurrences across
                 districts.</p>
         </div>
@@ -75,7 +68,7 @@
             <div class="metric-card gradient-2">
                 <div class="metric-info">
                     <h3>Year Range</h3>
-                    <p class="number">10 Yrs</p>
+                    <p class="number">15 Yrs</p>
                 </div>
                 <div class="icon">📅</div>
             </div>
@@ -91,7 +84,32 @@
         <!-- Dashboard Grid -->
         <div class="dashboard-grid h-grid">
 
-            <!-- Chart 1: Top 5 Districts by Precip -->
+            <!-- Chart 1: Peak Rainfall Seasonality (Table) -->
+            <div class="chart-card wide">
+                <div class="card-header">
+                    <h3>Peak Rainfall Seasonality</h3>
+                    <p>Most precipitous month for each district</p>
+                </div>
+                <!-- Scrollable Table Container -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>District</th>
+                                <th>Peak Month</th>
+                                <th>Total Precipitation (hrs)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="precipTableBody">
+                            <tr class="loading-row">
+                                <td colspan="3">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Chart 2: Top 5 Districts by Precip -->
             <div class="chart-card wide" id="precipitation">
                 <div class="card-header">
                     <h3>Top 5 Wettest Districts</h3>
@@ -132,31 +150,6 @@
                 </div>
                 <div class="canvas-container">
                     <canvas id="extremeWeatherChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Chart 2: Precipitous Month (Table) - Now at bottom -->
-            <div class="chart-card wide">
-                <div class="card-header">
-                    <h3>Peak Rainfall Seasonality</h3>
-                    <p>Most precipitous month for each district</p>
-                </div>
-                <!-- Scrollable Table Container -->
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>District</th>
-                                <th>Peak Month</th>
-                                <th>Total Precipitation (hrs)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="precipTableBody">
-                            <tr class="loading-row">
-                                <td colspan="3">Loading data...</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
 

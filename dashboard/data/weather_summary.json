@@ -1,64 +1,182 @@
 {
-    "top_districts": {
-        "labels": [
-            "Ampara",
-            "Colombo",
-            "Galle",
-            "Gampaha",
-            "Kandy"
-        ],
-        "data": [
-            2034.0,
-            900.0,
-            800.0,
-            650.0,
-            300.0
-        ]
-    },
-    "peak_seasonality": [
+    "peakSeasonality": [
         {
             "district": "Ampara",
-            "month": "January",
-            "total_precipitation": 361.0
+            "month": "December",
+            "averagePrecipitation": 367.43
+        },
+        {
+            "district": "Anuradhapura",
+            "month": "November",
+            "averagePrecipitation": 285.36
+        },
+        {
+            "district": "Badulla",
+            "month": "December",
+            "averagePrecipitation": 341.5
+        },
+        {
+            "district": "Bandarawela",
+            "month": "November",
+            "averagePrecipitation": 324.57
+        },
+        {
+            "district": "Batticaloa",
+            "month": "December",
+            "averagePrecipitation": 410.07
         },
         {
             "district": "Colombo",
-            "month": "February",
-            "total_precipitation": 500.0
+            "month": "May",
+            "averagePrecipitation": 480.13
         },
         {
-            "district": "Gampaha",
-            "month": "February",
-            "total_precipitation": 600.0
-        },
-        {
-            "district": "Kandy",
-            "month": "February",
-            "total_precipitation": 300.0
-        },
-        {
-            "district": "Jaffna",
-            "month": "February",
-            "total_precipitation": 100.0
+            "district": "Eliya",
+            "month": "October",
+            "averagePrecipitation": 359.07
         },
         {
             "district": "Galle",
-            "month": "February",
-            "total_precipitation": 800.0
+            "month": "May",
+            "averagePrecipitation": 471.4
+        },
+        {
+            "district": "Gampaha",
+            "month": "June",
+            "averagePrecipitation": 494.0
+        },
+        {
+            "district": "Hambantota",
+            "month": "November",
+            "averagePrecipitation": 289.07
+        },
+        {
+            "district": "Jaffna",
+            "month": "November",
+            "averagePrecipitation": 365.79
+        },
+        {
+            "district": "Kalutara",
+            "month": "May",
+            "averagePrecipitation": 484.93
+        },
+        {
+            "district": "Kandy",
+            "month": "October",
+            "averagePrecipitation": 317.57
+        },
+        {
+            "district": "Kegalle",
+            "month": "June",
+            "averagePrecipitation": 406.93
+        },
+        {
+            "district": "Kilinochchi",
+            "month": "November",
+            "averagePrecipitation": 366.93
+        },
+        {
+            "district": "Kurunegala",
+            "month": "October",
+            "averagePrecipitation": 341.36
+        },
+        {
+            "district": "Mannar",
+            "month": "November",
+            "averagePrecipitation": 318.0
+        },
+        {
+            "district": "Matale",
+            "month": "October",
+            "averagePrecipitation": 324.57
+        },
+        {
+            "district": "Matara",
+            "month": "September",
+            "averagePrecipitation": 424.79
+        },
+        {
+            "district": "Moneragala",
+            "month": "November",
+            "averagePrecipitation": 303.14
+        },
+        {
+            "district": "Mullaitivu",
+            "month": "November",
+            "averagePrecipitation": 395.5
+        },
+        {
+            "district": "Polonnaruwa",
+            "month": "December",
+            "averagePrecipitation": 314.36
+        },
+        {
+            "district": "Puttalam",
+            "month": "October",
+            "averagePrecipitation": 351.43
+        },
+        {
+            "district": "Ratnapura",
+            "month": "August",
+            "averagePrecipitation": 528.79
+        },
+        {
+            "district": "Trincomalee",
+            "month": "December",
+            "averagePrecipitation": 393.14
+        },
+        {
+            "district": "Vavuniya",
+            "month": "November",
+            "averagePrecipitation": 291.14
+        },
+        {
+            "district": "Welimada",
+            "month": "December",
+            "averagePrecipitation": 327.36
         }
     ],
-    "temperature_analysis": {
+    "topDistricts": {
+        "labels": [
+            "Ratnapura",
+            "Galle",
+            "Kalutara",
+            "Colombo",
+            "Gampaha"
+        ],
+        "data": [
+            62920.0,
+            59687.0,
+            58260.0,
+            57559.0,
+            56254.0
+        ]
+    },
+    "temperatureAnalysis": {
         "overall": {
-            "above_30": 14.8,
-            "below_30": 85.2
+            "above30": 0.3,
+            "below30": 99.7
         },
-        "by_year": {
-            "2010": 21.1,
-            "2011": 0.0
+        "byYear": {
+            "2010": 0.0,
+            "2011": 0.0,
+            "2012": 0.0,
+            "2013": 0.0,
+            "2014": 0.3,
+            "2015": 0.0,
+            "2016": 0.0,
+            "2017": 0.0,
+            "2018": 0.0,
+            "2019": 2.8,
+            "2020": 0.0,
+            "2021": 0.0,
+            "2022": 0.0,
+            "2023": 0.3,
+            "2024": 1.2
         }
     },
     "meta": {
-        "total_records": 27,
-        "generated_at": "Today"
+        "totalRecords": 4698,
+        "generatedAt": "Today"
     }
 }

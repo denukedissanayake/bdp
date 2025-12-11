@@ -1,24 +1,21 @@
 document.addEventListener('DOMContentLoaded', function () {
-
-    // Global Chart Defaults
+    // Chart.js global styling
     Chart.defaults.font.family = "'Outfit', sans-serif";
     Chart.defaults.color = '#64748b';
     Chart.defaults.scale.grid.color = 'rgba(0, 0, 0, 0.03)';
 
-    // FETCH DATA FROM JSON FILE
+    // Load weather data
     fetch('data/weather_summary.json')
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load data');
-            }
+            if (!response.ok) throw new Error('Failed to load data');
             return response.json();
         })
         .then(data => {
             console.log("Dashboard Data Loaded:", data);
-            initTopDistrictsChart(data.top_districts);
-            initPrecipTable(data.peak_seasonality);
-            initTempHighChart(data.temperature_analysis);
-            initExtremeWeatherChart(); // Still using placeholder for Hive data
+            initTopDistrictsChart(data.topDistricts);
+            initPrecipTable(data.peakSeasonality);
+            initTempHighChart(data.temperatureAnalysis);
+            initExtremeWeatherChart();
         })
         .catch(err => {
             console.error("Error loading dashboard data:", err);
@@ -28,9 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-    // ==========================================
-    // 1. Top 5 Districts by Total Precipitation
-    // ==========================================
+    // 1. Top 5 Districts by Total Precipitation (Horizontal Bar Chart)
     function initTopDistrictsChart(data) {
         const ctx = document.getElementById('topDistrictsChart').getContext('2d');
         new Chart(ctx, {
@@ -54,9 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ==========================================
-    // 2. Most Precipitous Month Seasonality (Table)
-    // ==========================================
+    // 2. Peak Precipitation per District (Table)
     function initPrecipTable(peakData) {
         const tableBody = document.getElementById('precipTableBody');
         tableBody.innerHTML = "";
@@ -66,15 +59,13 @@ document.addEventListener('DOMContentLoaded', function () {
             tr.innerHTML = `
                 <td>${row.district}</td>
                 <td><span class="highlight">${row.month}</span></td>
-                <td>${row.total_precipitation} hrs</td>
+                <td>${row.averagePrecipitation} hrs</td>
             `;
             tableBody.appendChild(tr);
         });
     }
 
-    // ==========================================
-    // 3a. High Temp Frequency (Overall - Doughnut)
-    // ==========================================
+    // 3a. Temperature Analysis - Overall (Doughnut Chart)
     function initTempHighChart(data) {
         const ctx = document.getElementById('tempHighChart').getContext('2d');
         new Chart(ctx, {
@@ -82,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 labels: ['> 30°C Months', '< 30°C Months'],
                 datasets: [{
-                    data: [data.overall.above_30, data.overall.below_30],
+                    data: [data.overall.above30, data.overall.below30],
                     backgroundColor: ['#ff4d6d', '#e2e8f0'],
                     borderWidth: 0,
                     hoverOffset: 4
@@ -96,22 +87,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Also init the yearly chart
         initTempYearlyChart(data);
     }
 
-    // ==========================================
-    // 3b. High Temp Frequency (By Year - Line)
-    // ==========================================
+    // 3b. Temperature Analysis - By Year (Line Chart)
     function initTempYearlyChart(data) {
         const ctx = document.getElementById('tempYearlyChart').getContext('2d');
 
-        if (!data.by_year || Object.keys(data.by_year).length === 0) {
-            return; // No yearly data available
-        }
+        if (!data.byYear || Object.keys(data.byYear).length === 0) return;
 
-        const years = Object.keys(data.by_year);
-        const percentages = Object.values(data.by_year);
+        const years = Object.keys(data.byYear);
+        const percentages = Object.values(data.byYear);
 
         new Chart(ctx, {
             type: 'line',
@@ -154,9 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ==========================================
-    // 4. Extreme Weather Events (Placeholder - needs Hive data)
-    // ==========================================
+    // 4. Extreme Weather Events (Placeholder)
     function initExtremeWeatherChart() {
         const ctx = document.getElementById('extremeWeatherChart').getContext('2d');
         new Chart(ctx, {
@@ -179,5 +163,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
 });
