@@ -1,25 +1,26 @@
 -- Task 1: Rank Top 10 Most Temperate Cities
--- Ranks cities by average maximum temperature (temperature_2m_max)
+-- Definition of Temperate:
+-- 1. Moderate average temperature (10°C - 25°C)
+-- 2. Most stable climate (Lowest Standard Deviation of max temperature)
 
 SET hive.cli.print.header=true;
 
-DROP VIEW IF EXISTS weather_with_city;
-CREATE VIEW weather_with_city AS
+-- Creating a temporary "virtual table" named city_data
+WITH city_data AS (
+    SELECT 
+        l.city_name,
+        AVG(w.temperature_2m_max) as avg_temp,
+        STDDEV(w.temperature_2m_max) as temp_variation
+    FROM weather_data w
+    JOIN location_data l ON w.location_id = l.location_id
+    GROUP BY l.city_name
+    HAVING avg_temp BETWEEN 10 AND 25
+)
+-- Select top 10 most stable cities with explicit rank
 SELECT 
-    w.temperature_2m_max,
-    w.temperature_2m_min,
-    w.temperature_2m_mean,
-    l.city_name
-FROM weather_data w
-JOIN location_data l ON w.location_id = l.location_id;
-
-SELECT 
-    city_name AS City,
-    ROUND(AVG(temperature_2m_max), 2) AS Avg_Max_Temp,
-    ROUND(AVG(temperature_2m_min), 2) AS Avg_Min_Temp,
-    ROUND(AVG(temperature_2m_mean), 2) AS Avg_Mean_Temp,
-    COUNT(*) AS Total_Records
-FROM weather_with_city
-GROUP BY city_name
-ORDER BY Avg_Max_Temp DESC
+    DENSE_RANK() OVER (ORDER BY temp_variation ASC) as Rank,
+    city_name as City,
+    ROUND(avg_temp, 2) as Avg_Temp,
+    ROUND(temp_variation, 2) as Variation
+FROM city_data
 LIMIT 10;

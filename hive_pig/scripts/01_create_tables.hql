@@ -1,7 +1,3 @@
--- ==========================================
--- Hive Weather Analytics - Table Definitions
--- ==========================================
-
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS weather_data;
 DROP TABLE IF EXISTS location_data;
