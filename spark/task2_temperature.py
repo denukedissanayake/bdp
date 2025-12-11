@@ -1,100 +1,93 @@
 # -*- coding: utf-8 -*-
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
-    col, avg, max as spark_max, year, month, weekofyear, to_date, round as spark_round
+    col, avg, max as sparkMax, year, month, weekofyear, to_date, round as sparkRound
 )
 from pyspark.sql.window import Window
 from pyspark.sql import functions as F
 
-
-def create_spark_session():
-    """Create and configure Spark session."""
+def createSparkSession():
     return (SparkSession.builder
         .appName("Task2_Weekly_Max_Temperature_Analysis")
         .getOrCreate())
 
-
-def load_weather_data(spark, input_path):
+def loadWeatherData(spark, inputPath):  
     df = (spark.read
         .option("header", "true")
         .option("inferSchema", "true")
-        .csv(input_path))
+        .csv(inputPath))
     
-    df = df.withColumnRenamed("temperature_2m_max (°C)", "temp_max")
+    df = df.withColumnRenamed("temperature_2m_max (°C)", "tempMax")
     
     return df
 
+def parseDates(df):
+    return (df.withColumn("dateParsed", to_date(col("date"), "M/d/yyyy"))
+             .withColumn("year", year("dateParsed"))
+             .withColumn("month", month("dateParsed"))
+             .withColumn("week", weekofyear("dateParsed")))
 
-def parse_dates(df):
-    return (df.withColumn("date_parsed", to_date(col("date"), "M/d/yyyy"))
-             .withColumn("year", year("date_parsed"))
-             .withColumn("month", month("date_parsed"))
-             .withColumn("week", weekofyear("date_parsed")))
-
-
-def find_hottest_months(df):
+def findHottestMonths(df):
     """
     Find the hottest month for each year.
     Hottest month = month with highest average maximum temperature.
     """
-    monthly_temps = (df.filter(col("temp_max").isNotNull())
+    monthlyTemps = (df.filter(col("tempMax").isNotNull())
                       .groupBy("year", "month")
-                      .agg(avg("temp_max").alias("avg_max_temp")))
+                      .agg(avg("tempMax").alias("avgMaxTemp")))
     
-    window_spec = Window.partitionBy("year").orderBy(col("avg_max_temp").desc())
+    windowSpec = Window.partitionBy("year").orderBy(col("avgMaxTemp").desc())
     
-    hottest_months = (monthly_temps
-        .withColumn("rank", F.row_number().over(window_spec))
+    hottestMonths = (monthlyTemps
+        .withColumn("rank", F.row_number().over(windowSpec))
         .filter(col("rank") == 1)
         .select(
-            col("year").alias("hottest_year"),
-            col("month").alias("hottest_month"),
-            spark_round("avg_max_temp", 2).alias("avg_temp")
+            col("year").alias("hottestYear"),
+            col("month").alias("hottestMonth"),
+            sparkRound("avgMaxTemp", 2).alias("avgTemp")
         ))
     
-    return hottest_months
+    return hottestMonths
 
-
-def calculate_weekly_max_temps(df, hottest_months):
-    df_with_hottest = df.join(
-        hottest_months,
-        (df["year"] == hottest_months["hottest_year"]) & 
-        (df["month"] == hottest_months["hottest_month"]),
+def calculateWeeklyMaxTemps(df, hottestMonths):
+    dfWithHottest = df.join(
+        hottestMonths,
+        (df["year"] == hottestMonths["hottestYear"]) & 
+        (df["month"] == hottestMonths["hottestMonth"]),
         "inner"
     )
     
-    weekly_max = (df_with_hottest
-        .groupBy("hottest_year", "hottest_month", "week")
-        .agg(spark_max("temp_max").alias("weekly_max_temp"))
+    weeklyMax = (dfWithHottest
+        .groupBy("hottestYear", "hottestMonth", "week")
+        .agg(sparkMax("tempMax").alias("weeklyMaxTemp"))
         .select(
-            col("hottest_year").alias("year"),
-            col("hottest_month").alias("month"),
+            col("hottestYear").alias("year"),
+            col("hottestMonth").alias("month"),
             col("week"),
-            spark_round("weekly_max_temp", 2).alias("max_temperature")
+            sparkRound("weeklyMaxTemp", 2).alias("maxTemperature")
         )
         .orderBy("year", "week"))
     
-    return weekly_max
-
+    return weeklyMax
 
 def main():
-    spark = create_spark_session()
+    spark = createSparkSession()
     spark.sparkContext.setLogLevel("WARN")
     
-    input_path = "hdfs://namenode:9000/user/data/input/weatherData.csv"
+    inputPath = "hdfs://namenode:9000/user/data/input/weatherData.csv"
     
     print("TASK 2: Weekly Maximum Temperatures for Hottest Months of Each Year")
     
-    df = load_weather_data(spark, input_path)
-    df = parse_dates(df)
+    df = loadWeatherData(spark, inputPath)
+    df = parseDates(df)
     
-    hottest_months = find_hottest_months(df)
+    hottestMonths = findHottestMonths(df)
     
-    hottest_months.orderBy("hottest_year").show(20, truncate=False)
+    hottestMonths.orderBy("hottestYear").show(20, truncate=False)
     
-    weekly_max = calculate_weekly_max_temps(df, hottest_months)
+    weeklyMax = calculateWeeklyMaxTemps(df, hottestMonths)
     
-    weekly_max.show(100, truncate=False)
+    weeklyMax.show(100, truncate=False)
     
     spark.stop()
 
