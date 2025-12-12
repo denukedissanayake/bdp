@@ -25,14 +25,14 @@ ORDER BY rank ASC, city_name ASC;
 WITH extreme_events_by_year AS (
     SELECT 
         l.city_name,
-        year(to_date(w.date_str)) AS event_year,
+        YEAR(FROM_UNIXTIME(UNIX_TIMESTAMP(w.date_str, 'M/d/yyyy'))) AS event_year,
         COUNT(*) AS extreme_event_days
     FROM weather_data w
     JOIN location_data l ON w.location_id = l.location_id
     WHERE 
         w.precipitation_sum > 10.0 
         AND w.wind_gusts_10m_max > 40.0
-    GROUP BY l.city_name, year(to_date(w.date_str))
+    GROUP BY l.city_name, YEAR(FROM_UNIXTIME(UNIX_TIMESTAMP(w.date_str, 'M/d/yyyy')))
 )
 SELECT 
     city_name,
