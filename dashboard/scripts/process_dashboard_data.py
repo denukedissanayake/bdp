@@ -7,6 +7,7 @@ from collections import defaultdict
 scriptDir = os.path.dirname(os.path.abspath(__file__))
 dataDir = os.path.join(scriptDir, '..', 'data')
 inputFile = os.path.join(dataDir, 'total_precipitation_and_mean_temperature_result.txt')
+extremeWeatherFile = os.path.join(dataDir, 'extream_weather_days')
 outputFile = os.path.join(dataDir, 'weather_summary.json')
 
 # Data parsing
@@ -84,7 +85,7 @@ def calculateHighTempPercentage(data):
         return {"overall": {"above30": 0, "below30": 0}, "byYear": {}}
 
     # Overall calculation
-    highTempCount = sum(1 for entry in data if entry['temperature'] > 30)
+    highTempCount = sum(1 for entry in data if entry['temperature'] >= 30)
     percentHigh = (highTempCount / totalMonths) * 100
     percentLow = 100 - percentHigh
     
@@ -93,7 +94,7 @@ def calculateHighTempPercentage(data):
     for entry in data:
         year = entry['year']
         yearData[year]["total"] += 1
-        if entry['temperature'] > 30:
+        if entry['temperature'] >= 30:
             yearData[year]["above30"] += 1
     
     byYear = {}
@@ -107,6 +108,44 @@ def calculateHighTempPercentage(data):
             "below30": round(percentLow, 1)
         },
         "byYear": byYear
+    }
+
+# 4. Extreme weather events by city and year
+def calculateExtremeWeather(filePath):
+    """Parse extreme weather data - yearly breakdown per city for grouped bar chart"""
+    cityYearData = defaultdict(dict)
+    allYears = set()
+    
+    if not os.path.exists(filePath):
+        print(f"Warning: Extreme weather file {filePath} not found.")
+        return {"cities": [], "years": [], "data": {}}
+    
+    with open(filePath, 'r') as f:
+        next(f)  # Skip header row
+        for line in f:
+            parts = line.strip().split('\t')
+            if len(parts) >= 3:
+                cityName = parts[0]
+                year = parts[1]
+                extremeDays = int(parts[2])
+                cityYearData[cityName][year] = extremeDays
+                allYears.add(year)
+    
+    # Sort cities alphabetically and years chronologically
+    sortedCities = sorted(cityYearData.keys())
+    sortedYears = sorted(allYears)
+    
+    # Build data structure for grouped bar chart
+    data = {}
+    for city in sortedCities:
+        data[city] = {}
+        for year in sortedYears:
+            data[city][year] = cityYearData[city].get(year, 0)
+    
+    return {
+        "cities": sortedCities,
+        "years": sortedYears,
+        "data": data
     }
 
 # Main execution
@@ -123,12 +162,14 @@ def main():
     peakMonths = calculatePeakMonths(rawData)
     topFiveDistricts = calculateTopDistricts(rawData)
     tempAnalysis = calculateHighTempPercentage(rawData)
+    extremeWeather = calculateExtremeWeather(extremeWeatherFile)
     
     # Build dashboard JSON
     dashboardData = {
         "peakSeasonality": peakMonths,
         "topDistricts": topFiveDistricts,
         "temperatureAnalysis": tempAnalysis,
+        "extremeWeather": extremeWeather,
         "meta": {
             "totalRecords": len(rawData),
             "generatedAt": "Today"
@@ -143,6 +184,7 @@ def main():
     print(f"Success! Dashboard data saved to {outputFile}")
     print("Top 5:", topFiveDistricts)
     print("Temp > 30%:", tempAnalysis['overall']['above30'])
+    print(f"Extreme Weather: {len(extremeWeather['cities'])} cities, {len(extremeWeather['years'])} years")
 
 if __name__ == "__main__":
     main()

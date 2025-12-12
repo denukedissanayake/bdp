@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
             initTopDistrictsChart(data.topDistricts);
             initPrecipTable(data.peakSeasonality);
             initTempHighChart(data.temperatureAnalysis);
-            initExtremeWeatherChart();
+            initExtremeWeatherChart(data.extremeWeather);
         })
         .catch(err => {
             console.error("Error loading dashboard data:", err);
@@ -140,26 +140,68 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 4. Extreme Weather Events (Placeholder)
-    function initExtremeWeatherChart() {
-        const ctx = document.getElementById('extremeWeatherChart').getContext('2d');
+    // 4. Extreme Weather Events (Grouped Bar Chart by City and Year)
+    function initExtremeWeatherChart(data) {
+        const container = document.getElementById('extremeWeatherChart').parentElement;
+        const canvas = document.getElementById('extremeWeatherChart');
+
+        // Make container scrollable horizontally with proper size for all cities
+        const widthPerCity = 250;
+        const minWidth = data.cities.length * widthPerCity;
+        container.style.overflowX = 'auto';
+        container.style.overflowY = 'visible';
+        container.style.height = '550px';
+        canvas.style.width = minWidth + 'px';
+        canvas.style.minWidth = minWidth + 'px';
+        canvas.style.height = '520px';
+
+        const ctx = canvas.getContext('2d');
+
+        // Generate color palette for years
+        const yearColors = [
+            '#4361ee', '#3a0ca3', '#7209b7', '#f72585', '#4cc9f0',
+            '#06d6a0', '#118ab2', '#ef476f', '#ffd166', '#073b4c',
+            '#8338ec', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'
+        ];
+
+        // Create datasets for each year
+        const datasets = data.years.map((year, index) => {
+            const yearData = data.cities.map(city => data.data[city][year] || 0);
+            return {
+                label: year,
+                data: yearData,
+                backgroundColor: yearColors[index % yearColors.length],
+                borderRadius: 2
+            };
+        });
+
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Gampaha', 'Colombo', 'Jaffna', 'Trincomalee', 'Batticaloa', 'Galle'],
-                datasets: [{
-                    label: 'Days with Extreme Events',
-                    data: [45, 38, 12, 8, 5, 22],
-                    backgroundColor: '#4895ef',
-                    borderRadius: 4,
-                    barThickness: 20
-                }]
+                labels: data.cities,
+                datasets: datasets
             },
             options: {
-                responsive: true,
+                responsive: false,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { boxWidth: 15, padding: 10, font: { size: 11 } }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: false,
+                        ticks: { font: { size: 11 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 80,
+                        title: { display: true, text: 'Extreme Event Days' }
+                    }
+                }
             }
         });
     }
