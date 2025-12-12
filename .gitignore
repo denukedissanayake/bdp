@@ -98,7 +98,7 @@ pip-delete-this-directory.txt
 
 # Jupyter Notebook
 .ipynb_checkpoints
-*.ipynb
+# *.ipynb
 
 # ============================================
 # R (if you use R for analysis)
