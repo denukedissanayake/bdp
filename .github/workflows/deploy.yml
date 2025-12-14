@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "dashboard/**" # Only trigger on changes in dashboard folder
+  workflow_dispatch: # Allows manual triggering from Actions tab
 
 permissions:
   contents: read
