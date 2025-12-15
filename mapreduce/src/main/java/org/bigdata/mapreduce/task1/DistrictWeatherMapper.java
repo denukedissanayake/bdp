@@ -38,7 +38,6 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
                 while ((line = reader.readLine()) != null) {
                     line = line.trim();
 
-                    // Skip header
                     if (WeatherDataParser.isHeader(line)) {
                         continue;
                     }
@@ -98,7 +97,7 @@ public class DistrictWeatherMapper extends Mapper<LongWritable, Text, Text, Text
                 return;
             }
 
-            // Extract precipitation_hours (index 13) and temperature_2m_mean (index 5)
+            // Extract precipitation_hours and temperature_2m_mean
             double precipitationHours = WeatherDataParser.parseDouble(fields[13]);
             double temperatureMean = WeatherDataParser.parseDouble(fields[5]);
 
