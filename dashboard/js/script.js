@@ -12,9 +12,17 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(data => {
             console.log("Dashboard Data Loaded:", data);
+            const threshold = data.meta?.tempThreshold || 25;
+
+            // Update HTML labels with threshold value
+            const overallLabel = document.getElementById('tempOverallLabel');
+            const yearlyLabel = document.getElementById('tempYearlyLabel');
+            if (overallLabel) overallLabel.textContent = `% of months with mean temp > ${threshold}°C across all years`;
+            if (yearlyLabel) yearlyLabel.textContent = `% of months with mean temp > ${threshold}°C per year`;
+
             initTopDistrictsChart(data.topDistricts);
             initPrecipTable(data.peakSeasonality);
-            initTempHighChart(data.temperatureAnalysis);
+            initTempHighChart(data.temperatureAnalysis, threshold);
             initExtremeWeatherChart(data.extremeWeather);
         })
         .catch(err => {
@@ -66,14 +74,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 3a. Temperature Analysis - Overall (Doughnut Chart)
-    function initTempHighChart(data) {
+    function initTempHighChart(data, threshold) {
         const ctx = document.getElementById('tempHighChart').getContext('2d');
         new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['> 30°C Months', '< 30°C Months'],
+                labels: [`> ${threshold}°C Months`, `< ${threshold}°C Months`],
                 datasets: [{
-                    data: [data.overall.above30, data.overall.below30],
+                    data: [data.overall.aboveThreshold, data.overall.belowThreshold],
                     backgroundColor: ['#ff4d6d', '#e2e8f0'],
                     borderWidth: 0,
                     hoverOffset: 4
@@ -87,11 +95,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        initTempYearlyChart(data);
+        initTempYearlyChart(data, threshold);
     }
 
     // 3b. Temperature Analysis - By Year (Line Chart)
-    function initTempYearlyChart(data) {
+    function initTempYearlyChart(data, threshold) {
         const ctx = document.getElementById('tempYearlyChart').getContext('2d');
 
         if (!data.byYear || Object.keys(data.byYear).length === 0) return;
@@ -104,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 labels: years,
                 datasets: [{
-                    label: '% Months > 30°C',
+                    label: `% Months > ${threshold}°C`,
                     data: percentages,
                     borderColor: '#ff4d6d',
                     backgroundColor: 'rgba(255, 77, 109, 0.1)',
@@ -124,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                return context.parsed.y + '% of months > 30°C';
+                                return context.parsed.y + `% of months > ${threshold}°C`;
                             }
                         }
                     }

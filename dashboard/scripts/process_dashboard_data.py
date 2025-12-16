@@ -10,6 +10,9 @@ inputFile = os.path.join(dataDir, 'total_precipitation_and_mean_temperature_resu
 extremeWeatherFile = os.path.join(dataDir, 'extream_weather_days')
 outputFile = os.path.join(dataDir, 'weather_summary.json')
 
+# Temperature threshold for high heat analysis (change this value as needed)
+TEMP_THRESHOLD = 25
+
 # Data parsing
 def parseData(filePath):
     """Parse weather data from text file"""
@@ -77,35 +80,35 @@ def calculateTopDistricts(data):
         "data": [item[1] for item in sortedDistricts]
     }
 
-# 3. Percentage of months with mean temperature above 30°C
+# 3. Percentage of months with mean temperature above threshold
 def calculateHighTempPercentage(data):
-    """Calculate percentage of months with temperature > 30°C per year"""
+    """Calculate percentage of months with temperature > TEMP_THRESHOLD per year"""
     totalMonths = len(data)
     if totalMonths == 0: 
-        return {"overall": {"above30": 0, "below30": 0}, "byYear": {}}
+        return {"overall": {"aboveThreshold": 0, "belowThreshold": 0}, "byYear": {}}
 
     # Overall calculation
-    highTempCount = sum(1 for entry in data if entry['temperature'] > 30)
+    highTempCount = sum(1 for entry in data if entry['temperature'] > TEMP_THRESHOLD)
     percentHigh = (highTempCount / totalMonths) * 100
     percentLow = 100 - percentHigh
     
     # Per-year calculation
-    yearData = defaultdict(lambda: {"total": 0, "above30": 0})
+    yearData = defaultdict(lambda: {"total": 0, "aboveThreshold": 0})
     for entry in data:
         year = entry['year']
         yearData[year]["total"] += 1
-        if entry['temperature'] > 30:
-            yearData[year]["above30"] += 1
+        if entry['temperature'] > TEMP_THRESHOLD:
+            yearData[year]["aboveThreshold"] += 1
     
     byYear = {}
     for year, counts in sorted(yearData.items()):
-        pct = (counts["above30"] / counts["total"]) * 100 if counts["total"] > 0 else 0
+        pct = (counts["aboveThreshold"] / counts["total"]) * 100 if counts["total"] > 0 else 0
         byYear[str(year)] = round(pct, 1)
     
     return {
         "overall": {
-            "above30": round(percentHigh, 1),
-            "below30": round(percentLow, 1)
+            "aboveThreshold": round(percentHigh, 1),
+            "belowThreshold": round(percentLow, 1)
         },
         "byYear": byYear
     }
@@ -172,6 +175,7 @@ def main():
         "extremeWeather": extremeWeather,
         "meta": {
             "totalRecords": len(rawData),
+            "tempThreshold": TEMP_THRESHOLD,
             "generatedAt": "Today"
         }
     }
@@ -183,7 +187,7 @@ def main():
         
     print(f"Success! Dashboard data saved to {outputFile}")
     print("Top 5:", topFiveDistricts)
-    print("Temp > 30%:", tempAnalysis['overall']['above30'])
+    print(f"Temp > {TEMP_THRESHOLD}%:", tempAnalysis['overall']['aboveThreshold'])
     print(f"Extreme Weather: {len(extremeWeather['cities'])} cities, {len(extremeWeather['years'])} years")
 
 if __name__ == "__main__":
