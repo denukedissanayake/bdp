@@ -85,7 +85,7 @@ def calculateHighTempPercentage(data):
         return {"overall": {"above30": 0, "below30": 0}, "byYear": {}}
 
     # Overall calculation
-    highTempCount = sum(1 for entry in data if entry['temperature'] >= 30)
+    highTempCount = sum(1 for entry in data if entry['temperature'] > 30)
     percentHigh = (highTempCount / totalMonths) * 100
     percentLow = 100 - percentHigh
     
@@ -94,7 +94,7 @@ def calculateHighTempPercentage(data):
     for entry in data:
         year = entry['year']
         yearData[year]["total"] += 1
-        if entry['temperature'] >= 30:
+        if entry['temperature'] > 30:
             yearData[year]["above30"] += 1
     
     byYear = {}
